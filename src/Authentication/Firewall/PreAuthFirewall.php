@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
  *
  * @since   0.1
  */
-final class SecurityFirewall implements Firewall
+final class PreAuthFirewall implements Firewall
 {
     /**
      * @var     RequestMatcherInterface

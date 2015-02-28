@@ -91,6 +91,6 @@ class FirewallKernelTest extends \Chrisguitarguy\StackSecurity\TestCase
             ->with($this->identicalTo($this->request))
             ->willReturn($resp);
 
-        $resp;
+        return $resp;
     }
 }

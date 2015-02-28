@@ -40,7 +40,7 @@ abstract class AbstractKernel implements HttpKernelInterface, TerminableInterfac
      */
     public function handle(Request $req, $type=self::MASTER_REQUEST, $catch=true)
     {
-        $this->wrapped->handle($req, $type, $catch);
+        return $this->wrapped->handle($req, $type, $catch);
     }
 
     /**

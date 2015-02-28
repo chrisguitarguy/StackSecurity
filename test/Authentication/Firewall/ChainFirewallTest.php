@@ -11,9 +11,6 @@ namespace Chrisguitarguy\StackSecurity\Authentication\Firewall;
 
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 
-/**
- * @group unit
- */
 class ChainFirewallTest extends \Chrisguitarguy\StackSecurity\TestCase
 {
     public function testMatchReturnsNullWhenNoFirewallsMatchRequest()

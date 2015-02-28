@@ -62,10 +62,10 @@ final class SecurityFirewall implements Firewall
      */
     public function match(Request $request)
     {
-        if ($this->matcher->matches($request)) {
-            return $this->preauth->createToken($request, $this->providerKey);
+        if (!$this->matcher->matches($request)) {
+            return self::DECLINE;
         }
 
-        return null;
+        return $this->preauth->createToken($request, $this->providerKey);
     }
 }

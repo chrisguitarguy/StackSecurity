@@ -26,7 +26,7 @@ class SecurityFirewallTest extends \Chrisguitarguy\StackSecurity\TestCase
         $this->preauth->expects($this->never())
             ->method('createToken');
 
-        $this->assertNull($this->firewall->match($req));
+        $this->assertEquals(Firewall::DECLINE, $this->firewall->match($req));
     }
 
     public function testFirewallCallsPreAuthenticatorWhenRequestMatcherSucceedes()

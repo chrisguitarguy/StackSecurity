@@ -39,8 +39,8 @@ final class ChainFirewall implements Firewall
     public function match(Request $request)
     {
         foreach ($this->firewalls as $firewall) {
-            if (null !== $token = $firewall->match($request)) {
-                return $token;
+            if (self::DECLINE !== $tokenOrResponse = $firewall->match($request)) {
+                return $tokenOrResponse;
             }
         }
     }

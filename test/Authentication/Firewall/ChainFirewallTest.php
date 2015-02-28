@@ -20,7 +20,7 @@ class ChainFirewallTest extends \Chrisguitarguy\StackSecurity\TestCase
             $this->firewallReturning(null),
         ]);
 
-        $this->assertNull($f->match($this->createRequest()));
+        $this->assertEquals(Firewall::DECLINE, $f->match($this->createRequest()));
     }
 
     public function testMatchReturnsTheValueFromAMatchingFirewall()

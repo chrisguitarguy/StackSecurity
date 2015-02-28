@@ -14,9 +14,9 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
- * Firewalls match income requests again known rules and a rule matches, the firewall
- * will return an SimplePreAuthenticatorInterface that can kick off the authentication
- * process.
+ * Firewalls check incoming requests against know rules and issues a token if the
+ * request contains required information or issues a challenge if authentication
+ * is required.
  *
  * @since   0.1
  */

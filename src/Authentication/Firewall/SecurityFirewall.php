@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\Security\Core\Authentication\SimplePreAuthenticatorInterface;
+use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
 /**
  * A firewall implementation that uses the Symfony SimplePreAutheticatorInterface
@@ -28,14 +29,19 @@ final class SecurityFirewall implements Firewall
     private $matcher;
 
     /**
+     * @var     string
+     */
+    private $providerKey;
+
+    /**
      * @var     SimplePreAuthenticatorInterface
      */
     private $preauth;
 
     /**
-     * @var     string
+     * @var     AuthenticationEntryPointInterface|null
      */
-    private $providerKey;
+    private $entryPoint;
 
     /**
      * Constructor. Set up the matcher and pre authenticator.
@@ -50,11 +56,16 @@ final class SecurityFirewall implements Firewall
      * @param   $preauth The pre authenticator to use
      * @return  void
      */
-    public function __construct($matcher, $providerKey, SimplePreAuthenticatorInterface $preauth)
-    {
+    public function __construct(
+        $matcher,
+        $providerKey,
+        SimplePreAuthenticatorInterface $preauth,
+        AuthenticationEntryPointInterface $entryPoint=null
+    ) {
         $this->matcher = $matcher instanceof RequestMatcherInterface ? $matcher : new RequestMatcher($matcher);
         $this->providerKey = $providerKey;
         $this->preauth = $preauth;
+        $this->entryPoint = $entryPoint;
     }
 
     /**
@@ -66,6 +77,28 @@ final class SecurityFirewall implements Firewall
             return self::DECLINE;
         }
 
-        return $this->preauth->createToken($request, $this->providerKey);
+        $token = $this->preauth->createToken($request, $this->providerKey);
+
+        return $token ? $token : $this->start($request);
     }
+
+    private function start(Request $req)
+    {
+        if ($this->preauthIsEntrypoint()) {
+            return $this->preauth->start($req);
+        }
+
+        return $this->hasEntryPoint() ? $this->entryPoint->start($req) : self::DECLINE;
+    }
+
+    private function preauthIsEntrypoint()
+    {
+        return $this->preauth instanceof AuthenticationEntryPointInterface;
+    }
+
+    private function hasEntryPoint()
+    {
+        return null !== $this->entryPoint;
+    }
+
 }

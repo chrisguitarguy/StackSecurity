@@ -11,19 +11,15 @@ namespace Chrisguitarguy\StackSecurity\Authentication;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
-class ErrorHandlingKernelTest extends \Chrisguitarguy\StackSecurity\TestCase
+class ChallengingKernelTest extends \Chrisguitarguy\StackSecurity\TestCase
 {
     private $wrapped, $kernel, $request;
 
-    public function testKernelReturnsResponseFromWrappedKernelWhenNoExceptionIsThrown()
+    public function testResponseWithout401StatusAndStackHeaderIsReturned()
     {
-        $resp = new Response('hello, world');
-        $this->wrapped->expects($this->once())
-            ->method('handle')
-            ->with($this->identicalTo($this->request))
-            ->willReturn($resp);
+        $resp = new Response('Access Denied', 401);
+        $this->kernelReturns($resp);
 
         $this->assertSame($resp, $this->kernel->handle($this->request));
     }
@@ -31,12 +27,10 @@ class ErrorHandlingKernelTest extends \Chrisguitarguy\StackSecurity\TestCase
     /**
      * @expectedException Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      */
-    public function testKernelThrowsAccessDeniedExceptionFromHandlerWhenAuthenticationFails()
+    public function testKernelWithStackAuthResponseCallsEntryPointForAChallengeResponse()
     {
-        $this->wrapped->expects($this->once())
-            ->method('handle')
-            ->with($this->identicalTo($this->request))
-            ->willThrowException(new AuthenticationException('oops'));
+        $resp = new Response('broken', 401, ['WWW-Authenticate' => 'Stack']);
+        $this->kernelReturns($resp);
 
         $this->kernel->handle($this->request);
     }
@@ -44,7 +38,15 @@ class ErrorHandlingKernelTest extends \Chrisguitarguy\StackSecurity\TestCase
     protected function setUp()
     {
         $this->wrapped = $this->getMock(HttpKernelInterface::class);
-        $this->kernel = new ErrorHandlingKernel($this->wrapped);
+        $this->kernel = new ChallengingKernel($this->wrapped);
         $this->request = $this->createRequest();
+    }
+
+    private function kernelReturns(Response $resp)
+    {
+        $this->wrapped->expects($this->once())
+            ->method('handle')
+            ->with($this->identicalTo($this->request))
+            ->willReturn($resp);
     }
 }

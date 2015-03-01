@@ -31,7 +31,7 @@ use Symfony\Component\Security\Http\AccessMap;
  *
  * @group acceptance
  */
-class AcceptanceTest extends \Chrisguitarguy\StackSecurity\TestCase
+class AcceptanceTest extends TestCase
 {
     const USER = 'testUser';
     const USER2 = 'testUser2';
